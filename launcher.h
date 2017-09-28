@@ -8,7 +8,7 @@ class Launcher : public QObject
 {
     Q_OBJECT
 public:
-    Launcher();
+    Launcher(int argc, char *argv[]);
 
 signals:
 
