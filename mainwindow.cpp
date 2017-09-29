@@ -2,7 +2,10 @@
 
 MainWindow::MainWindow()
 {
-    //Init window settings
+    //Init central widget and window settings
+    m_tabs = new QTabWidget;
+    m_tabs->setTabsClosable(true);
+    setCentralWidget(m_tabs);
     setWindowIcon(QIcon(":/icones/web.png"));
 
     //Init actions
@@ -14,7 +17,7 @@ MainWindow::MainWindow()
     m_nextPage = new QAction(QIcon(":/icones/suiv.png"), tr("Next Page"));
     m_reload = new QAction(QIcon(":/icones/actu.png"), tr("Reload"));
     m_home = new QAction(QIcon(":/icones/home.png"), tr("Home Page"));
-    m_urlField = new QTextEdit;
+    m_urlField = new QLineEdit;
     m_load = new QAction(QIcon(":/icones/go.png"), tr("Load the page"));
 
     m_aboutMyChrome = new QAction(tr("About MyChrome"));
@@ -26,6 +29,9 @@ MainWindow::MainWindow()
     m_previousPage->setShortcut(QKeySequence(QKeySequence::Back));
     m_nextPage->setShortcut(QKeySequence(QKeySequence::Forward));
     m_reload->setShortcut(QKeySequence(QKeySequence::Refresh));
+
+    m_previousPage->setEnabled(false);
+    m_nextPage->setEnabled(false);
 
     //Init menus and tool bars
     QMenu *fileMenu = menuBar()->addMenu(tr("File"));
@@ -51,5 +57,80 @@ MainWindow::MainWindow()
     navigateToolBar->addWidget(m_urlField);
     navigateToolBar->addAction(m_load);
 
+    //Add status bar
+    m_progress = new QProgressBar;
+    statusBar()->addPermanentWidget(m_progress, 1);
 
+    //Add first tab
+    addTab();
+
+    connect(m_addTab, SIGNAL(triggered()), this, SLOT(addTab()));
+    connect(m_deleteTab, SIGNAL(triggered()), this, SLOT(removeTab()));
+    connect(m_tabs, SIGNAL(tabCloseRequested(int)), this, SLOT(removeTab(int)));
+    connect(m_quit, SIGNAL(triggered()), qApp, SLOT(quit()));
+    connect(m_reload, SIGNAL(triggered()), this, SLOT(askReload()));
+    connect(m_home, SIGNAL(triggered()), this, SLOT(askGoHome()));
+    connect(m_urlField, SIGNAL(returnPressed()), this, SLOT(askLoad()));
+    connect(m_load, SIGNAL(triggered()), this, SLOT(askLoad()));
+    connect(m_aboutQt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
+}
+
+WebPage* MainWindow::currentPage()
+{
+    return (WebPage*)m_tabs->currentWidget();
+}
+
+void MainWindow::addTab()
+{
+    WebPage *page = new WebPage;
+    m_tabs->addTab(page, tr("Tab"));
+    m_tabs->setCurrentIndex(m_tabs->count()-1);
+    page->load(QUrl(HOME_URL));
+    connect(page, SIGNAL(reqChangeIcon(QIcon,WebPage*)), this, SLOT(changeIcon(QIcon,WebPage*)));
+    connect(page, SIGNAL(reqChangeTitle(QString,WebPage*)), this, SLOT(changeTitle(QString,WebPage*)));
+    connect(page, SIGNAL(reqChangeUrlText(QString,WebPage*)), this, SLOT(changeUrlField(QString,WebPage*)));
+    connect(page, SIGNAL(loadProgress(int)), m_progress, SLOT(setValue(int)));
+    connect(page, SIGNAL(resetFullscreen(QWidget*)), m_tabs, SLOT(setCurrentWidget(QWidget*)));
+}
+
+void MainWindow::removeTab(int index)
+{
+    if(m_tabs->count() == 1)
+        qApp->quit();
+    if(index == -1)
+        index = m_tabs->currentIndex();
+    m_tabs->removeTab(index);
+}
+
+void MainWindow::changeIcon(QIcon newIcon, WebPage *from)
+{
+    m_tabs->setTabIcon(m_tabs->indexOf(from), newIcon);
+}
+
+void MainWindow::changeTitle(QString newTitle, WebPage *from)
+{
+    m_tabs->setTabText(m_tabs->indexOf(from), newTitle);
+}
+
+void MainWindow::changeUrlField(QString newText, WebPage *from)
+{
+    if(m_tabs->currentIndex() == m_tabs->indexOf(from))
+        m_urlField->setText(newText);
+}
+
+void MainWindow::askLoad(QString url)
+{
+    if(url == 0)
+        url = m_urlField->text();
+    currentPage()->load(QUrl(url));
+}
+
+void MainWindow::askGoHome()
+{
+    askLoad(HOME_URL);
+}
+
+void MainWindow::askReload()
+{
+    currentPage()->reload();
 }

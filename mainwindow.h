@@ -3,6 +3,8 @@
 
 #include <QtWidgets>
 #include <QtWebEngineWidgets>
+#include "webpage.h"
+#define HOME_URL "https://www.google.fr"
 
 class MainWindow : public QMainWindow
 {
@@ -10,12 +12,23 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow();
+    WebPage* currentPage();
 
 public slots:
+    void addTab();
+    void removeTab(int index=-1);
+    void changeIcon(QIcon newIcon, WebPage *from);
+    void changeTitle(QString newTitle, WebPage *from);
+    void changeUrlField(QString newText, WebPage *from);
+    void askLoad(QString url = 0);
+    void askGoHome();
+    void askReload();
 
 signals:
 
 private:
+    QTabWidget *m_tabs;
+
     QAction *m_addTab;
     QAction *m_deleteTab;
     QAction *m_quit;
@@ -24,11 +37,13 @@ private:
     QAction *m_nextPage;
     QAction *m_reload;
     QAction *m_home;
-    QTextEdit *m_urlField;
+    QLineEdit *m_urlField;
     QAction *m_load;
 
     QAction *m_aboutMyChrome;
     QAction *m_aboutQt;
+
+    QProgressBar *m_progress;
 };
 
 #endif // MAINWINDOW_H

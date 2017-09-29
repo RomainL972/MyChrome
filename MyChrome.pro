@@ -27,11 +27,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    launcher.cpp
+    launcher.cpp \
+    webpage.cpp \
+    webhistory.cpp
 
 HEADERS += \
         mainwindow.h \
-    launcher.h
+    launcher.h \
+    webpage.h \
+    webhistory.h
 
 RESOURCES += \
     resources.qrc
