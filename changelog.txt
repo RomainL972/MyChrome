@@ -6,8 +6,20 @@ The buttons Previous page and Next page don't work, they are just disabled
 You can enter in fullscreen mode but not leaving
 The WebHistory class is empty
 
+Version 1.1
+Add download manager
+disable fullscreen temporarily
+correct README
+remove greaterThan(5.4) for web engine
+add changelog and Readme as part of the project
+use more optimised functions
+remove slots changeIcon and changeTitle, it can be done from the WebPage
+add m_parent to WebPage
+replace google by duckduckgo
+
+
 Future:
-Manage downloads
 Fix fullscreen
 Create global history
 Use buttons Previous page and Next page
+Add settings page for home page, search engine...

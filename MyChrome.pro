@@ -4,10 +4,9 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui webenginewidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-greaterThan(QT_MINOR_VERSION, 5.4): QT += webenginewidgets
 
 TARGET = MyChrome
 TEMPLATE = app
@@ -29,13 +28,19 @@ SOURCES += \
         mainwindow.cpp \
     launcher.cpp \
     webpage.cpp \
-    webhistory.cpp
+    webhistory.cpp \
+    downloadmanager.cpp
 
 HEADERS += \
         mainwindow.h \
     launcher.h \
     webpage.h \
-    webhistory.h
+    webhistory.h \
+    downloadmanager.h
 
 RESOURCES += \
     resources.qrc
+
+DISTFILES += \
+    changelog.txt \
+    Readme.md

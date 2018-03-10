@@ -82,13 +82,10 @@ WebPage* MainWindow::currentPage()
 
 void MainWindow::addTab()
 {
-    WebPage *page = new WebPage;
+    WebPage *page = new WebPage(m_tabs);
     m_tabs->addTab(page, tr("Tab"));
-    m_tabs->setCurrentIndex(m_tabs->count()-1);
+    m_tabs->setCurrentIndex(m_tabs->indexOf(page));
     page->load(QUrl(HOME_URL));
-    connect(page, SIGNAL(reqChangeIcon(QIcon,WebPage*)), this, SLOT(changeIcon(QIcon,WebPage*)));
-    connect(page, SIGNAL(reqChangeTitle(QString,WebPage*)), this, SLOT(changeTitle(QString,WebPage*)));
-    connect(page, SIGNAL(reqChangeUrlText(QString,WebPage*)), this, SLOT(changeUrlField(QString,WebPage*)));
     connect(page, SIGNAL(loadProgress(int)), m_progress, SLOT(setValue(int)));
     connect(page, SIGNAL(resetFullscreen(QWidget*)), m_tabs, SLOT(setCurrentWidget(QWidget*)));
 }
@@ -102,20 +99,9 @@ void MainWindow::removeTab(int index)
     m_tabs->removeTab(index);
 }
 
-void MainWindow::changeIcon(QIcon newIcon, WebPage *from)
+void MainWindow::changeUrlField(QString newText)
 {
-    m_tabs->setTabIcon(m_tabs->indexOf(from), newIcon);
-}
-
-void MainWindow::changeTitle(QString newTitle, WebPage *from)
-{
-    m_tabs->setTabText(m_tabs->indexOf(from), newTitle);
-}
-
-void MainWindow::changeUrlField(QString newText, WebPage *from)
-{
-    if(m_tabs->currentIndex() == m_tabs->indexOf(from))
-        m_urlField->setText(newText);
+    m_urlField->setText(newText);
 }
 
 void MainWindow::askLoad(QString url)

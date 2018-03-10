@@ -4,7 +4,7 @@
 #include <QtWidgets>
 #include <QtWebEngineWidgets>
 #include "webpage.h"
-#define HOME_URL "https://www.google.fr"
+#define HOME_URL "http://www.lebbadi.fr"
 
 class MainWindow : public QMainWindow
 {
@@ -17,9 +17,7 @@ public:
 public slots:
     void addTab();
     void removeTab(int index=-1);
-    void changeIcon(QIcon newIcon, WebPage *from);
-    void changeTitle(QString newTitle, WebPage *from);
-    void changeUrlField(QString newText, WebPage *from);
+    void changeUrlField(QString newText);
     void askLoad(QString url = 0);
     void askGoHome();
     void askReload();
