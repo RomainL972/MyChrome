@@ -15,7 +15,6 @@ public:
     void urlCheck(QString &url);
 
 signals:
-    void resetFullscreen(QWidget *currentWidget);
 
 public slots:
     void changeTitle(QString title);

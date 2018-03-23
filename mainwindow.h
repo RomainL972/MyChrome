@@ -21,6 +21,11 @@ public slots:
     void askLoad(QString url = 0);
     void askGoHome();
     void askReload();
+    void checkForwardBack();
+    void askGoBack();
+    void askGoForward();
+    void hideToolBar();
+    void showToolBar();
 
 signals:
 
@@ -30,6 +35,8 @@ private:
     QAction *m_addTab;
     QAction *m_deleteTab;
     QAction *m_quit;
+
+    QToolBar *m_toolBar;
 
     QAction *m_previousPage;
     QAction *m_nextPage;

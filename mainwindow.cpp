@@ -49,20 +49,17 @@ MainWindow::MainWindow()
     aboutMenu->addAction(m_aboutMyChrome);
     aboutMenu->addAction(m_aboutQt);
 
-    QToolBar *navigateToolBar = addToolBar(tr("Navigate"));
-    navigateToolBar->addAction(m_previousPage);
-    navigateToolBar->addAction(m_nextPage);
-    navigateToolBar->addAction(m_reload);
-    navigateToolBar->addAction(m_home);
-    navigateToolBar->addWidget(m_urlField);
-    navigateToolBar->addAction(m_load);
+    m_toolBar = addToolBar(tr("Navigate"));
+    m_toolBar->addAction(m_previousPage);
+    m_toolBar->addAction(m_nextPage);
+    m_toolBar->addAction(m_reload);
+    m_toolBar->addAction(m_home);
+    m_toolBar->addWidget(m_urlField);
+    m_toolBar->addAction(m_load);
 
     //Add status bar
     m_progress = new QProgressBar;
     statusBar()->addPermanentWidget(m_progress, 1);
-
-    //Add first tab
-    addTab();
 
     connect(m_addTab, SIGNAL(triggered()), this, SLOT(addTab()));
     connect(m_deleteTab, SIGNAL(triggered()), this, SLOT(removeTab()));
@@ -73,6 +70,12 @@ MainWindow::MainWindow()
     connect(m_urlField, SIGNAL(returnPressed()), this, SLOT(askLoad()));
     connect(m_load, SIGNAL(triggered()), this, SLOT(askLoad()));
     connect(m_aboutQt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
+    connect(m_tabs, SIGNAL(currentChanged(int)), this, SLOT(checkForwardBack()));
+    connect(m_previousPage, SIGNAL(triggered()), this, SLOT(askGoBack()));
+    connect(m_nextPage, SIGNAL(triggered()), this, SLOT(askGoForward()));
+
+    //Add first tab
+    addTab();
 }
 
 WebPage* MainWindow::currentPage()
@@ -87,7 +90,6 @@ void MainWindow::addTab()
     m_tabs->setCurrentIndex(m_tabs->indexOf(page));
     page->load(QUrl(HOME_URL));
     connect(page, SIGNAL(loadProgress(int)), m_progress, SLOT(setValue(int)));
-    connect(page, SIGNAL(resetFullscreen(QWidget*)), m_tabs, SLOT(setCurrentWidget(QWidget*)));
 }
 
 void MainWindow::removeTab(int index)
@@ -119,4 +121,30 @@ void MainWindow::askGoHome()
 void MainWindow::askReload()
 {
     currentPage()->reload();
+}
+
+void MainWindow::checkForwardBack()
+{
+    m_previousPage->setEnabled(currentPage()->history()->canGoBack());
+    m_nextPage->setEnabled(currentPage()->history()->canGoForward());
+}
+
+void MainWindow::askGoBack()
+{
+    currentPage()->history()->back();
+}
+
+void MainWindow::askGoForward()
+{
+    currentPage()->history()->forward();
+}
+
+void MainWindow::hideToolBar()
+{
+    m_toolBar->hide();
+}
+
+void MainWindow::showToolBar()
+{
+    m_toolBar->show();
 }

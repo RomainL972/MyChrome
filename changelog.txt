@@ -1,12 +1,12 @@
 This changelog shows the main changes in each versions
 
-Version 1.0 - Friday September 29th 2017 9h55am:
+Version 1.0 - Fri, 29 Sep 2017 19:53:27 +1000
 The first really working version
 The buttons Previous page and Next page don't work, they are just disabled
 You can enter in fullscreen mode but not leaving
 The WebHistory class is empty
 
-Version 1.1
+Version 1.1 - Sat, 10 Mar 2018 15:35:41
 Add download manager
 disable fullscreen temporarily
 correct README
@@ -17,9 +17,12 @@ remove slots changeIcon and changeTitle, it can be done from the WebPage
 add m_parent to WebPage
 replace google by duckduckgo
 
+Version 1.2
+Fix fullscreen
+Add previous and next buttons
+Fullscreen hides everything around WebPage and puts MainWindow in fullscreen, there is a small border around the window
+ToolBar is now a property of MainWindow
 
 Future:
-Fix fullscreen
 Create global history
-Use buttons Previous page and Next page
 Add settings page for home page, search engine...

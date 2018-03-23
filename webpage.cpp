@@ -4,12 +4,13 @@ WebPage::WebPage(QTabWidget *parent):
     m_parent(parent),
     m_downloadManager(new DownloadManager)
 {
-    settings()->setAttribute(QWebEngineSettings::FullScreenSupportEnabled, false);
+    settings()->setAttribute(QWebEngineSettings::FullScreenSupportEnabled, true);
     connect(this, SIGNAL(iconChanged(QIcon)), this, SLOT(changeIcon(QIcon)));
     connect(this, SIGNAL(titleChanged(QString)), this, SLOT(changeTitle(QString)));
     connect(this, SIGNAL(urlChanged(QUrl)), this, SLOT(changeUrl(QUrl)));
     connect(page(), SIGNAL(fullScreenRequested(QWebEngineFullScreenRequest)), this, SLOT(setFullScreen(QWebEngineFullScreenRequest)));
     connect(page()->profile(), SIGNAL(downloadRequested(QWebEngineDownloadItem*)), m_downloadManager, SLOT(downloadItem(QWebEngineDownloadItem*)));
+    connect(this, SIGNAL(loadProgress(int)), (MainWindow*)m_parent->parent(), SLOT(checkForwardBack()));
 }
 
 void WebPage::urlCheck(QString &url)
@@ -49,14 +50,30 @@ void WebPage::load(QString url)
 
 void WebPage::setFullScreen(QWebEngineFullScreenRequest request)
 {
+    MainWindow *parent = (MainWindow*) m_parent->parentWidget();
+    if(request.toggleOn() && parent->isFullScreen()){
+        qDebug("Already fullscreen");
+        request.reject();
+        return;
+    }
     if(request.toggleOn()) {
-        setParent(nullptr);
-        showFullScreen();
+        m_parent->tabBar()->hide();
+
+        parent->menuBar()->hide();
+        parent->statusBar()->hide();
+        parent->hideToolBar();
+        parent->showFullScreen();
+
         request.accept();
     }
     else {
-        hide();
-        emit resetFullscreen(this);
+        m_parent->tabBar()->show();
+
+        parent->menuBar()->show();
+        parent->statusBar()->show();
+        parent->showToolBar();
+        parent->showMaximized();
+
         request.accept();
     }
 }
