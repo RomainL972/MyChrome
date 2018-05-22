@@ -12,7 +12,8 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow();
-    WebPage* currentPage();
+    WebPage* currentPage() const;
+    DownloadManager* downloadManager() const;
 
 public slots:
     void addTab();
@@ -30,6 +31,7 @@ public slots:
 signals:
 
 private:
+    DownloadManager *m_downloadManager;
     QTabWidget *m_tabs;
 
     QAction *m_addTab;

@@ -1,27 +1,29 @@
 #include "mainwindow.h"
 
-MainWindow::MainWindow()
+MainWindow::MainWindow() :
+    m_downloadManager(new DownloadManager),
+    m_tabs(new QTabWidget),
+    //Init Actions
+    //File
+    m_addTab(new QAction(tr("Add a Tab"))),
+    m_deleteTab(new QAction(tr("Delete current Tab"))),
+    m_quit(new QAction(tr("Quit"))),
+    //Navigate
+    m_previousPage(new QAction(QIcon(":/icones/prec.png"), tr("Previous Page"))),
+    m_nextPage(new QAction(QIcon(":/icones/suiv.png"), tr("Next Page"))),
+    m_reload(new QAction(QIcon(":/icones/actu.png"), tr("Reload"))),
+    m_home(new QAction(QIcon(":/icones/home.png"), tr("Home Page"))),
+    m_urlField(new QLineEdit),
+    m_load(new QAction(QIcon(":/icones/go.png"), tr("Load the page"))),
+    //About
+    m_aboutMyChrome(new QAction(tr("About MyChrome"))),
+    m_aboutQt(new QAction(tr("About Qt")))
+
 {
     //Init central widget and window settings
-    m_tabs = new QTabWidget;
     m_tabs->setTabsClosable(true);
     setCentralWidget(m_tabs);
     setWindowIcon(QIcon(":/icones/web.png"));
-
-    //Init actions
-    m_addTab = new QAction(tr("Add a Tab"));
-    m_deleteTab = new QAction(tr("Delete current Tab"));
-    m_quit = new QAction(tr("Quit"));
-
-    m_previousPage = new QAction(QIcon(":/icones/prec.png"), tr("Previous Page"));
-    m_nextPage = new QAction(QIcon(":/icones/suiv.png"), tr("Next Page"));
-    m_reload = new QAction(QIcon(":/icones/actu.png"), tr("Reload"));
-    m_home = new QAction(QIcon(":/icones/home.png"), tr("Home Page"));
-    m_urlField = new QLineEdit;
-    m_load = new QAction(QIcon(":/icones/go.png"), tr("Load the page"));
-
-    m_aboutMyChrome = new QAction(tr("About MyChrome"));
-    m_aboutQt = new QAction(tr("About Qt"));
 
     //Customizing actions
     m_addTab->setShortcut(QKeySequence(QKeySequence::AddTab));
@@ -78,9 +80,14 @@ MainWindow::MainWindow()
     addTab();
 }
 
-WebPage* MainWindow::currentPage()
+WebPage* MainWindow::currentPage() const
 {
     return (WebPage*)m_tabs->currentWidget();
+}
+
+DownloadManager* MainWindow::downloadManager() const
+{
+    return m_downloadManager;
 }
 
 void MainWindow::addTab()
@@ -110,7 +117,7 @@ void MainWindow::askLoad(QString url)
 {
     if(url == 0)
         url = m_urlField->text();
-    currentPage()->load(QUrl(url));
+    currentPage()->load(url);
 }
 
 void MainWindow::askGoHome()

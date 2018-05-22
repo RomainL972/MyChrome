@@ -6,7 +6,7 @@ The buttons Previous page and Next page don't work, they are just disabled
 You can enter in fullscreen mode but not leaving
 The WebHistory class is empty
 
-Version 1.1 - Sat, 10 Mar 2018 15:35:41
+Version 1.1 - Sat, 10 Mar 2018 15:35:41 +1100
 Add download manager
 disable fullscreen temporarily
 correct README
@@ -17,11 +17,20 @@ remove slots changeIcon and changeTitle, it can be done from the WebPage
 add m_parent to WebPage
 replace google by duckduckgo
 
-Version 1.2
+Version 1.2 - Fri, 23 Mar 2018 19:22:13 +1100
 Fix fullscreen
 Add previous and next buttons
 Fullscreen hides everything around WebPage and puts MainWindow in fullscreen, there is a small border around the window
 ToolBar is now a property of MainWindow
+
+Version 1.3
+Separate download manager and download item
+Add context menu for download item (Pause not working)
+Add a line in download item for current state
+Initiate actions in MainWindow before the { in constructor
+URL loading now uses QUrl::fromUserInput
+put download manager in mainwindow instead of webpage
+use of parent() and mainwindow() in WebPage instead of m_parent
 
 Future:
 Create global history

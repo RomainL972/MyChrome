@@ -29,14 +29,16 @@ SOURCES += \
     launcher.cpp \
     webpage.cpp \
     webhistory.cpp \
-    downloadmanager.cpp
+    downloadmanager.cpp \
+    downloaditem.cpp
 
 HEADERS += \
         mainwindow.h \
     launcher.h \
     webpage.h \
     webhistory.h \
-    downloadmanager.h
+    downloadmanager.h \
+    downloaditem.h
 
 RESOURCES += \
     resources.qrc

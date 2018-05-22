@@ -12,7 +12,8 @@ class WebPage : public QWebEngineView
 
 public:
     WebPage(QTabWidget *parent);
-    void urlCheck(QString &url);
+    MainWindow* mainWindow() const;
+    QTabWidget* parent() const;
 
 signals:
 
@@ -21,12 +22,10 @@ public slots:
     void changeUrl(QUrl url);
     void changeIcon(QIcon icon);
     void load(QUrl url);
-    void load(QString url);
+    void load(QString urlString);
     void setFullScreen(QWebEngineFullScreenRequest request);
 
 private:
-    DownloadManager *m_downloadManager;
-    QTabWidget *m_parent;
 };
 
 #include "mainwindow.h"
