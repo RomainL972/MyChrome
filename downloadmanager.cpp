@@ -1,17 +1,22 @@
+#include "downloaditem.h"
 #include "downloadmanager.h"
 
-DownloadManager::DownloadManager()
+#include <QWebEngineDownloadItem>
+#include <QVBoxLayout>
+
+DownloadManager::DownloadManager(QWidget *parent) : QWidget(parent)
 {
     setWindowTitle(tr("Downloads"));
-    m_layout = new QVBoxLayout;
-    setLayout(m_layout);
+    setLayout(new QVBoxLayout);
 }
 
 void DownloadManager::downloadItem(QWebEngineDownloadItem *download)
 {
     show();
     DownloadItem *downloadIt = new DownloadItem(download, this);
-    m_layout->addWidget(downloadIt);
+    layout()->addWidget(downloadIt);
     m_downloads.append(downloadIt);
     download->accept();
 }
+
+

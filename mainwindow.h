@@ -1,9 +1,12 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QtWidgets>
-#include <QtWebEngineWidgets>
-#include "webpage.h"
+#include <QMainWindow>
+class QProgressBar;
+class QLineEdit;
+class WebPage;
+class DownloadManager;
+
 #define HOME_URL "http://www.lebbadi.fr"
 
 class MainWindow : public QMainWindow
@@ -11,29 +14,24 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow();
-    WebPage* currentPage() const;
-    DownloadManager* downloadManager() const;
-
+    MainWindow(QWidget *parent = 0);
+    ~MainWindow();
+    WebPage *currentPage();
+    void askGoForward();
 public slots:
     void addTab();
-    void removeTab(int index=-1);
-    void changeUrlField(QString newText);
-    void askLoad(QString url = 0);
-    void askGoHome();
-    void askReload();
-    void checkForwardBack();
-    void askGoBack();
-    void askGoForward();
-    void hideToolBar();
+    void removeTab(int index);
+    DownloadManager *downloadManager();
     void showToolBar();
-
-signals:
-
+    void hideToolBar();
+    void askGoBack();
+    void checkForwardBack();
+    void askReload();
+    void askGoHome();
+    void askLoad(const QString & url="");
+    void changeUrlField(QString newText);
 private:
-    DownloadManager *m_downloadManager;
     QTabWidget *m_tabs;
-
     QAction *m_addTab;
     QAction *m_deleteTab;
     QAction *m_quit;
@@ -48,9 +46,10 @@ private:
     QAction *m_load;
 
     QAction *m_aboutMyChrome;
-    QAction *m_aboutQt;
 
     QProgressBar *m_progress;
+    QAction *m_aboutQt;
+    DownloadManager *m_downloadManager;
 };
 
 #endif // MAINWINDOW_H

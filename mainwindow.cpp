@@ -1,31 +1,40 @@
+#include "downloadmanager.h"
 #include "mainwindow.h"
+#include "webpage.h"
 
-MainWindow::MainWindow() :
-    m_downloadManager(new DownloadManager),
-    m_tabs(new QTabWidget),
-    //Init Actions
-    //File
-    m_addTab(new QAction(tr("Add a Tab"))),
-    m_deleteTab(new QAction(tr("Delete current Tab"))),
-    m_quit(new QAction(tr("Quit"))),
-    //Navigate
-    m_previousPage(new QAction(QIcon(":/icones/prec.png"), tr("Previous Page"))),
-    m_nextPage(new QAction(QIcon(":/icones/suiv.png"), tr("Next Page"))),
-    m_reload(new QAction(QIcon(":/icones/actu.png"), tr("Reload"))),
-    m_home(new QAction(QIcon(":/icones/home.png"), tr("Home Page"))),
-    m_urlField(new QLineEdit),
-    m_load(new QAction(QIcon(":/icones/go.png"), tr("Load the page"))),
-    //About
-    m_aboutMyChrome(new QAction(tr("About MyChrome"))),
-    m_aboutQt(new QAction(tr("About Qt")))
+#include <QAction>
+#include <QLineEdit>
+#include <QMenu>
+#include <QMenuBar>
+#include <QToolBar>
+#include <QStatusBar>
+#include <QProgressBar>
+#include <QApplication>
+#include <QWebEngineHistory>
 
+#include <functional>
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent),
+      m_tabs(new QTabWidget),
+      m_addTab(new QAction(tr("Add a Tab"))),
+      m_deleteTab(new QAction(tr("Delete current Tab"))),
+      m_quit(new QAction(tr("Quit"))),
+      //Navigate
+      m_previousPage(new QAction(QIcon(":/icones/prec.png"), tr("Previous Page"))),
+      m_nextPage(new QAction(QIcon(":/icones/suiv.png"), tr("Next Page"))),
+      m_reload(new QAction(QIcon(":/icones/actu.png"), tr("Reload"))),
+      m_home(new QAction(QIcon(":/icones/home.png"), tr("Home Page"))),
+      m_urlField(new QLineEdit),
+      m_load(new QAction(QIcon(":/icones/go.png"), tr("Load the page"))),
+      //About
+      m_aboutMyChrome(new QAction(tr("About MyChrome"))),
+      m_aboutQt(new QAction(tr("About Qt"))),
+      m_downloadManager(new DownloadManager)
 {
-    //Init central widget and window settings
-    m_tabs->setTabsClosable(true);
     setCentralWidget(m_tabs);
     setWindowIcon(QIcon(":/icones/web.png"));
 
-    //Customizing actions
     m_addTab->setShortcut(QKeySequence(QKeySequence::AddTab));
     m_deleteTab->setShortcut(QKeySequence(QKeySequence::Close));
     m_previousPage->setShortcut(QKeySequence(QKeySequence::Back));
@@ -63,40 +72,36 @@ MainWindow::MainWindow() :
     m_progress = new QProgressBar;
     statusBar()->addPermanentWidget(m_progress, 1);
 
-    connect(m_addTab, SIGNAL(triggered()), this, SLOT(addTab()));
-    connect(m_deleteTab, SIGNAL(triggered()), this, SLOT(removeTab()));
-    connect(m_tabs, SIGNAL(tabCloseRequested(int)), this, SLOT(removeTab(int)));
-    connect(m_quit, SIGNAL(triggered()), qApp, SLOT(quit()));
-    connect(m_reload, SIGNAL(triggered()), this, SLOT(askReload()));
-    connect(m_home, SIGNAL(triggered()), this, SLOT(askGoHome()));
-    connect(m_urlField, SIGNAL(returnPressed()), this, SLOT(askLoad()));
-    connect(m_load, SIGNAL(triggered()), this, SLOT(askLoad()));
-    connect(m_aboutQt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
-    connect(m_tabs, SIGNAL(currentChanged(int)), this, SLOT(checkForwardBack()));
-    connect(m_previousPage, SIGNAL(triggered()), this, SLOT(askGoBack()));
-    connect(m_nextPage, SIGNAL(triggered()), this, SLOT(askGoForward()));
+    connect(m_addTab, &QAction::triggered, this, &MainWindow::addTab);
+    connect(m_deleteTab, &QAction::triggered, std::bind(&MainWindow::removeTab, this, -1));
 
-    //Add first tab
+    connect(m_tabs,  &QTabWidget::tabCloseRequested, this, &MainWindow::removeTab);
+    connect(m_quit, &QAction::triggered, qApp, &QApplication::quit);
+    connect(m_reload, &QAction::triggered, this, &MainWindow::askReload);
+    connect(m_home, &QAction::triggered, this, &MainWindow::askGoHome);
+    connect(m_urlField, &QLineEdit::returnPressed, std::bind(&MainWindow::askLoad, this, ""));
+    connect(m_load, &QAction::triggered, std::bind(&MainWindow::askLoad, this, ""));
+    connect(m_aboutQt, &QAction::triggered, qApp,  &QApplication::aboutQt);
+    connect(m_tabs, &QTabWidget::currentChanged, this, &MainWindow::checkForwardBack);
+    connect(m_previousPage, &QAction::triggered, this, &MainWindow::askGoBack);
+    connect(m_nextPage, &QAction::triggered, this, &MainWindow::askGoForward);
+
+
     addTab();
 }
 
-WebPage* MainWindow::currentPage() const
+MainWindow::~MainWindow()
 {
-    return (WebPage*)m_tabs->currentWidget();
-}
 
-DownloadManager* MainWindow::downloadManager() const
-{
-    return m_downloadManager;
 }
 
 void MainWindow::addTab()
 {
     WebPage *page = new WebPage(m_tabs);
     m_tabs->addTab(page, tr("Tab"));
-    m_tabs->setCurrentIndex(m_tabs->indexOf(page));
+    m_tabs->setCurrentWidget(page);
     page->load(QUrl(HOME_URL));
-    connect(page, SIGNAL(loadProgress(int)), m_progress, SLOT(setValue(int)));
+    connect(page, &WebPage::loadProgress, m_progress, &QProgressBar::setValue);
 }
 
 void MainWindow::removeTab(int index)
@@ -108,16 +113,21 @@ void MainWindow::removeTab(int index)
     m_tabs->removeTab(index);
 }
 
-void MainWindow::changeUrlField(QString newText)
+WebPage* MainWindow::currentPage()
 {
-    m_urlField->setText(newText);
+    return (WebPage*)m_tabs->currentWidget();
 }
 
-void MainWindow::askLoad(QString url)
+
+DownloadManager* MainWindow::downloadManager()
 {
-    if(url == 0)
-        url = m_urlField->text();
-    currentPage()->load(url);
+    return m_downloadManager;
+}
+
+
+void MainWindow::askLoad(const QString &url)
+{
+    currentPage()->load(url.isEmpty() ? m_urlField->text(): url);
 }
 
 void MainWindow::askGoHome()
@@ -154,4 +164,9 @@ void MainWindow::hideToolBar()
 void MainWindow::showToolBar()
 {
     m_toolBar->show();
+}
+
+void MainWindow::changeUrlField(QString newText)
+{
+    m_urlField->setText(newText);
 }

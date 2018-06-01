@@ -1,82 +1,72 @@
+#include "mainwindow.h"
 #include "webpage.h"
+#include "downloadmanager.h"
 
-WebPage::WebPage(QTabWidget *parent):
-    QWebEngineView(parent)
+#include <QTabWidget>
+#include <QWebEngineSettings>
+#include <QWebEnginePage>
+#include <QWebEngineFullScreenRequest>
+#include <QWebEngineProfile>
+#include <QMenuBar>
+#include <QStatusBar>
+#include <QTabBar>
+
+
+WebPage::WebPage(QTabWidget *parent): QWebEngineView(parent), tabs(parent)
 {
+    mainWindow = qobject_cast<MainWindow *>(parent->parentWidget());
+
     settings()->setAttribute(QWebEngineSettings::FullScreenSupportEnabled, true);
-    connect(this, SIGNAL(iconChanged(QIcon)), this, SLOT(changeIcon(QIcon)));
-    connect(this, SIGNAL(titleChanged(QString)), this, SLOT(changeTitle(QString)));
-    connect(this, SIGNAL(urlChanged(QUrl)), this, SLOT(changeUrl(QUrl)));
-    connect(page(), SIGNAL(fullScreenRequested(QWebEngineFullScreenRequest)), this, SLOT(setFullScreen(QWebEngineFullScreenRequest)));
-    connect(page()->profile(), SIGNAL(downloadRequested(QWebEngineDownloadItem*)), mainWindow()->downloadManager(), SLOT(downloadItem(QWebEngineDownloadItem*)));
-    connect(this, SIGNAL(loadProgress(int)), mainWindow(), SLOT(checkForwardBack()));
+    connect(this, &QWebEngineView::iconChanged, this, &WebPage::changeIcon);
+    connect(this, &QWebEngineView::titleChanged, this, &WebPage::changeTitle);
+    connect(this, &QWebEngineView::urlChanged, this, &WebPage::changeUrl);
+    connect(page(), &QWebEnginePage::fullScreenRequested, this, &WebPage::setFullScreen);
+    connect(page()->profile(), &QWebEngineProfile::downloadRequested, mainWindow->downloadManager(), &DownloadManager::downloadItem);
+    connect(this, &QWebEngineView::loadProgress, mainWindow, &MainWindow::checkForwardBack);
+}
+
+void WebPage::changeTitle(const QString &title)
+{
+    tabs->setTabText(tabs->indexOf(this), title);
 }
 
 void WebPage::changeIcon(QIcon icon)
 {
-    parent()->setTabIcon(parent()->indexOf(this), icon);
-}
-
-void WebPage::changeTitle(QString title)
-{
-    parent()->setTabText(parent()->indexOf(this), title);
+    tabs->setTabIcon(tabs->indexOf(this), icon);
 }
 
 void WebPage::changeUrl(QUrl url)
 {
-    if(parent()->indexOf(this) == parent()->currentIndex())
-        mainWindow()->changeUrlField(url.toString());
-}
-
-void WebPage::load(QUrl url)
-{
-    QWebEngineView::load(url);
-}
-
-void WebPage::load(QString urlString)
-{
-    QUrl url(QUrl::fromUserInput(urlString));
-    if(url == QUrl())
-        url = QUrl::fromUserInput("duckduckgo.com/" + urlString);
-    load(url);
+    if(tabs->indexOf(this) == tabs->currentIndex())
+        mainWindow->changeUrlField(url.toString());
 }
 
 void WebPage::setFullScreen(QWebEngineFullScreenRequest request)
 {
-    MainWindow *main = mainWindow();
-    if(request.toggleOn() && main->isFullScreen()){
+
+    if(request.toggleOn() && mainWindow->isFullScreen()){
         qDebug("Already fullscreen");
         request.reject();
         return;
     }
     if(request.toggleOn()) {
-        parent()->tabBar()->hide();
+        tabs->tabBar()->hide();
 
-        main->menuBar()->hide();
-        main->statusBar()->hide();
-        main->hideToolBar();
-        main->showFullScreen();
+        mainWindow->menuBar()->hide();
+        mainWindow->statusBar()->hide();
+        mainWindow->hideToolBar();
+        mainWindow->showFullScreen();
 
         request.accept();
     }
     else {
-        parent()->tabBar()->show();
+        tabs->tabBar()->show();
 
-        main->menuBar()->show();
-        main->statusBar()->show();
-        main->showToolBar();
-        main->showMaximized();
+        mainWindow->menuBar()->show();
+        mainWindow->statusBar()->show();
+        mainWindow->showToolBar();
+        mainWindow->showMaximized();
 
         request.accept();
     }
-}
-
-MainWindow* WebPage::mainWindow() const
-{
-    return (MainWindow*)parent()->parent();
-}
-
-QTabWidget* WebPage::parent() const
-{
-    return (QTabWidget*)parent();
 }

@@ -1,33 +1,26 @@
 #ifndef WEBPAGE_H
 #define WEBPAGE_H
 
-#include <QtWebEngineWidgets>
-#include "downloadmanager.h"
 
+#include <QIcon>
+#include <QWebEngineFullScreenRequest>
+#include <QWebEngineView>
+class QTabWidget;
 class MainWindow;
 
 class WebPage : public QWebEngineView
 {
     Q_OBJECT
-
 public:
     WebPage(QTabWidget *parent);
-    MainWindow* mainWindow() const;
-    QTabWidget* parent() const;
-
-signals:
-
 public slots:
-    void changeTitle(QString title);
-    void changeUrl(QUrl url);
+    void changeTitle(const QString &title);
     void changeIcon(QIcon icon);
-    void load(QUrl url);
-    void load(QString urlString);
+    void changeUrl(QUrl url);
     void setFullScreen(QWebEngineFullScreenRequest request);
-
 private:
+    QTabWidget *tabs;
+    MainWindow *mainWindow;
 };
-
-#include "mainwindow.h"
 
 #endif // WEBPAGE_H

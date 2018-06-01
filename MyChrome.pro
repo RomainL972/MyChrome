@@ -26,7 +26,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    launcher.cpp \
     webpage.cpp \
     webhistory.cpp \
     downloadmanager.cpp \
@@ -34,7 +33,6 @@ SOURCES += \
 
 HEADERS += \
         mainwindow.h \
-    launcher.h \
     webpage.h \
     webhistory.h \
     downloadmanager.h \

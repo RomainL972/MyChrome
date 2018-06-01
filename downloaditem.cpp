@@ -1,7 +1,20 @@
 #include "downloaditem.h"
 
-DownloadItem::DownloadItem(QWebEngineDownloadItem *origin, QWidget *parent) : QWidget(parent), m_download(origin), m_progress(new QProgressBar)
+#include <QDesktopServices>
+#include <QFileInfo>
+#include <QLabel>
+#include <QMenu>
+#include <QMessageBox>
+#include <QProgressBar>
+#include <QUrl>
+#include <QVBoxLayout>
+
+DownloadItem::DownloadItem(QWebEngineDownloadItem *origin, QWidget *parent) :
+    QWidget(parent),
+    m_download(origin),
+    m_progress(new QProgressBar)
 {
+
     QLabel *name = new QLabel(m_download->path());
     m_state = new QLabel();
 
@@ -16,9 +29,10 @@ DownloadItem::DownloadItem(QWebEngineDownloadItem *origin, QWidget *parent) : QW
 
     setContextMenuPolicy(Qt::CustomContextMenu);
 
-    connect(m_download, SIGNAL(downloadProgress(qint64,qint64)), this, SLOT(displayProgress(qint64,qint64)));
-    connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(showContextMenu(QPoint)));
-    connect(m_download, SIGNAL(stateChanged(QWebEngineDownloadItem::DownloadState)), this, SLOT(displayState(QWebEngineDownloadItem::DownloadState)));
+    connect(m_download, &QWebEngineDownloadItem::downloadProgress, this, &DownloadItem::displayProgress);
+    connect(this, &QWidget::customContextMenuRequested, this, &DownloadItem::showContextMenu);
+    connect(m_download, &QWebEngineDownloadItem::stateChanged, this, &DownloadItem::displayState);
+
 }
 
 void DownloadItem::displayProgress(qint64 current, qint64 total)
@@ -42,10 +56,10 @@ void DownloadItem::showContextMenu(QPoint pos)
     m_pause = new QAction(tr("Pause"));
     QAction *cancel = new QAction(tr("Cancel"));
 
-    connect(open, SIGNAL(triggered()), this, SLOT(open()));
-    connect(openInFiles, SIGNAL(triggered()), this, SLOT(openInFiles()));
-    connect(m_pause, SIGNAL(triggered()), this, SLOT(pauseRequest()));
-    connect(cancel, SIGNAL(triggered()), m_download, SLOT(cancel()));
+    connect(open, &QAction::triggered, this, &DownloadItem::open);
+    connect(openInFiles, &QAction::triggered, this, &DownloadItem::openInFiles);
+    connect(m_pause, &QAction::triggered, this, &DownloadItem::pauseRequest);
+    connect(cancel, &QAction::triggered, m_download, &QWebEngineDownloadItem::cancel);
 
     QPoint globalPos = mapToGlobal(pos);
 
@@ -100,3 +114,4 @@ void DownloadItem::displayState(QWebEngineDownloadItem::DownloadState state)
         QMessageBox::warning(this, tr("Download Interrupted"), m_download->interruptReasonString());
     }
 }
+
