@@ -32,6 +32,9 @@ URL loading now uses QUrl::fromUserInput
 put download manager in mainwindow instead of webpage
 use of parent() and mainwindow() in WebPage instead of m_parent
 
+Version 1.3.1
+Changing a lot of things to make it more regular, folow the common practices...
+
 Future:
 Create global history
 Add settings page for home page, search engine...

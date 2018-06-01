@@ -17,19 +17,21 @@ public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
     WebPage *currentPage();
-    void askGoForward();
+
 public slots:
-    void addTab();
+    WebPage* addTab(bool select = 1);
     void removeTab(int index);
     DownloadManager *downloadManager();
     void showToolBar();
     void hideToolBar();
+    void askGoForward();
     void askGoBack();
     void checkForwardBack();
     void askReload();
     void askGoHome();
     void askLoad(const QString & url="");
     void changeUrlField(QString newText);
+
 private:
     QTabWidget *m_tabs;
     QAction *m_addTab;

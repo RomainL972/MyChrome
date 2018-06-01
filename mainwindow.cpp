@@ -95,13 +95,19 @@ MainWindow::~MainWindow()
 
 }
 
-void MainWindow::addTab()
+WebPage* MainWindow::currentPage()
+{
+    return (WebPage*)m_tabs->currentWidget();
+}
+
+WebPage *MainWindow::addTab(bool select)
 {
     WebPage *page = new WebPage(m_tabs);
     m_tabs->addTab(page, tr("Tab"));
-    m_tabs->setCurrentWidget(page);
+    if(select) m_tabs->setCurrentWidget(page);
     page->load(QUrl(HOME_URL));
     connect(page, &WebPage::loadProgress, m_progress, &QProgressBar::setValue);
+    return page;
 }
 
 void MainWindow::removeTab(int index)
@@ -112,12 +118,6 @@ void MainWindow::removeTab(int index)
         index = m_tabs->currentIndex();
     m_tabs->removeTab(index);
 }
-
-WebPage* MainWindow::currentPage()
-{
-    return (WebPage*)m_tabs->currentWidget();
-}
-
 
 DownloadManager* MainWindow::downloadManager()
 {

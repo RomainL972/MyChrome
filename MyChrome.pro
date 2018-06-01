@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui webenginewidgets
+QMAKE_CXXFLAGS += -Werror
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
