@@ -6,6 +6,7 @@ class QProgressBar;
 class QLineEdit;
 class WebPage;
 class DownloadManager;
+class QCompleter;
 
 #define HOME_URL "http://www.lebbadi.fr"
 
@@ -31,6 +32,7 @@ public slots:
     void askGoHome();
     void askLoad(const QString & url="");
     void changeUrlField(QString newText);
+    void urlSuggest(QString text);
 
 private:
     QTabWidget *m_tabs;
@@ -45,6 +47,7 @@ private:
     QAction *m_reload;
     QAction *m_home;
     QLineEdit *m_urlField;
+    QCompleter *m_urlCompleter;
     QAction *m_load;
 
     QAction *m_aboutMyChrome;

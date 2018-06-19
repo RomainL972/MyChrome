@@ -14,7 +14,7 @@
 #include <QVBoxLayout>
 
 
-WebPage::WebPage(QWidget *parent, QWebEnginePage::WebWindowType page_type): QWebEngineView(parent), type(page_type)
+WebPage::WebPage(QWebEnginePage::WebWindowType page_type): type(page_type)
 {
     settings()->setAttribute(QWebEngineSettings::FullScreenSupportEnabled, true);
 
@@ -22,8 +22,6 @@ WebPage::WebPage(QWidget *parent, QWebEnginePage::WebWindowType page_type): QWeb
     connect(this, &QWebEngineView::titleChanged, this, &WebPage::changeTitle);
     connect(this, &QWebEngineView::urlChanged, this, &WebPage::changeUrl);
     connect(page(), &QWebEnginePage::fullScreenRequested, this, &WebPage::setFullScreen);
-    connect(page()->profile(), &QWebEngineProfile::downloadRequested, mainWindow()->downloadManager(), &DownloadManager::downloadItem);
-    connect(this, &QWebEngineView::loadProgress, mainWindow(), &MainWindow::checkForwardBack);
 }
 
 WebPage* WebPage::createWindow(QWebEnginePage::WebWindowType page_type)
@@ -40,7 +38,7 @@ WebPage* WebPage::createWindow(QWebEnginePage::WebWindowType page_type)
     case QWebEnginePage::WebDialog:
         dialog = new QDialog(mainWindow());
         dialog->setLayout(new QVBoxLayout());
-        page = new WebPage(mainWindow(), page_type);
+        page = new WebPage(page_type);
         layout()->addWidget(page);
         return page;
         break;
@@ -53,13 +51,13 @@ WebPage* WebPage::createWindow(QWebEnginePage::WebWindowType page_type)
 
 MainWindow* WebPage::mainWindow() const
 {
-    return qobject_cast<MainWindow*>(parentWidget()->parentWidget());
+    return qobject_cast<MainWindow*>(parentWidget()->parentWidget()->parentWidget());
 }
 
 QTabWidget* WebPage::tabs() const
 {
     if(type == QWebEnginePage::WebBrowserTab)
-        return qobject_cast<QTabWidget*>(parentWidget());
+        return qobject_cast<QTabWidget*>(parentWidget()->parentWidget());
     return nullptr;
 }
 
@@ -77,9 +75,10 @@ void WebPage::changeIcon(QIcon icon)
 
 void WebPage::changeUrl(QUrl url)
 {
-    if(!tabs())
+    QTabWidget *parent = tabs();
+    if(!parent)
         return;
-    if(tabs()->indexOf(this) == tabs()->currentIndex())
+    if(parent->indexOf(this) == parent->currentIndex())
         mainWindow()->changeUrlField(url.toString());
 }
 
@@ -121,4 +120,10 @@ void WebPage::setFullScreen(QWebEngineFullScreenRequest request)
 
         request.accept();
     }
+}
+
+void WebPage::load(const QString &url)
+{
+    QUrl final = QUrl::fromUserInput(url);
+    QWebEngineView::load(final.isEmpty() ? QUrl("https://duckduckgo.com/" + url) : final);
 }

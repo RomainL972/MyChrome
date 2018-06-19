@@ -11,6 +11,9 @@
 #include <QProgressBar>
 #include <QApplication>
 #include <QWebEngineHistory>
+#include <QWebEngineProfile>
+#include <QStringListModel>
+#include <QCompleter>
 
 #include <functional>
 
@@ -30,10 +33,12 @@ MainWindow::MainWindow(QWidget *parent)
       //About
       m_aboutMyChrome(new QAction(tr("About MyChrome"))),
       m_aboutQt(new QAction(tr("About Qt"))),
-      m_downloadManager(new DownloadManager)
+      m_downloadManager(new DownloadManager),
+      m_urlCompleter(new QCompleter)
 {
     setCentralWidget(m_tabs);
     setWindowIcon(QIcon(":/icones/web.png"));
+    m_tabs->setTabsClosable(true);
 
     m_addTab->setShortcut(QKeySequence(QKeySequence::AddTab));
     m_deleteTab->setShortcut(QKeySequence(QKeySequence::Close));
@@ -68,6 +73,8 @@ MainWindow::MainWindow(QWidget *parent)
     m_toolBar->addWidget(m_urlField);
     m_toolBar->addAction(m_load);
 
+    m_urlField->setCompleter(m_urlCompleter);
+
     //Add status bar
     m_progress = new QProgressBar;
     statusBar()->addPermanentWidget(m_progress, 1);
@@ -85,7 +92,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_tabs, &QTabWidget::currentChanged, this, &MainWindow::checkForwardBack);
     connect(m_previousPage, &QAction::triggered, this, &MainWindow::askGoBack);
     connect(m_nextPage, &QAction::triggered, this, &MainWindow::askGoForward);
-
+    connect(m_urlField, &QLineEdit::textChanged, this, &MainWindow::urlSuggest);
+    connect(m_urlCompleter, SIGNAL(activated(QString)), this, SLOT(askLoad(QString)));
 
     addTab();
 }
@@ -102,11 +110,13 @@ WebPage* MainWindow::currentPage()
 
 WebPage *MainWindow::addTab(bool select)
 {
-    WebPage *page = new WebPage(m_tabs);
+    WebPage *page = new WebPage();
     m_tabs->addTab(page, tr("Tab"));
     if(select) m_tabs->setCurrentWidget(page);
-    page->load(QUrl(HOME_URL));
+    page->load(HOME_URL);
     connect(page, &WebPage::loadProgress, m_progress, &QProgressBar::setValue);
+    connect(page->page()->profile(), &QWebEngineProfile::downloadRequested, downloadManager(), &DownloadManager::downloadItem);
+    connect(page, &QWebEngineView::loadProgress, this, &MainWindow::checkForwardBack);
     return page;
 }
 
@@ -169,4 +179,17 @@ void MainWindow::showToolBar()
 void MainWindow::changeUrlField(QString newText)
 {
     m_urlField->setText(newText);
+}
+
+void MainWindow::urlSuggest(QString text)
+{
+    QStringListModel *choices = new QStringListModel;
+    QStringList list;
+    QUrl url = QUrl::fromUserInput(text);
+    if(!url.isEmpty())
+        list.append(url.toString());
+    list.append("https://duckduckgo.com/" + text);
+    choices->setStringList(list);
+    m_urlCompleter->setModel(choices);
+    m_urlCompleter->setCompletionPrefix("http");
 }
