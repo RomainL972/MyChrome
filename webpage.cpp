@@ -40,6 +40,8 @@ WebPage* WebPage::createWindow(QWebEnginePage::WebWindowType page_type)
         dialog->setLayout(new QVBoxLayout());
         page = new WebPage(page_type);
         layout()->addWidget(page);
+        dialog->show();
+        page->load(HOME_URL);
         return page;
         break;
     case QWebEnginePage::WebBrowserBackgroundTab:

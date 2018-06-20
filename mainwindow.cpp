@@ -29,12 +29,12 @@ MainWindow::MainWindow(QWidget *parent)
       m_reload(new QAction(QIcon(":/icones/actu.png"), tr("Reload"))),
       m_home(new QAction(QIcon(":/icones/home.png"), tr("Home Page"))),
       m_urlField(new QLineEdit),
+      m_urlCompleter(new QCompleter),
       m_load(new QAction(QIcon(":/icones/go.png"), tr("Load the page"))),
       //About
       m_aboutMyChrome(new QAction(tr("About MyChrome"))),
       m_aboutQt(new QAction(tr("About Qt"))),
-      m_downloadManager(new DownloadManager),
-      m_urlCompleter(new QCompleter)
+      m_downloadManager(new DownloadManager)
 {
     setCentralWidget(m_tabs);
     setWindowIcon(QIcon(":/icones/web.png"));

@@ -10,6 +10,7 @@ class DownloadManager : public QWidget
     Q_OBJECT
 public:
     explicit DownloadManager(QWidget *parent = nullptr);
+    QList<DownloadItem *> downloads() const;
 
 public slots:
     void downloadItem(QWebEngineDownloadItem *download);

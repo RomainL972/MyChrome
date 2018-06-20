@@ -13,6 +13,10 @@ class DownloadItem : public QWidget
     Q_OBJECT
 public:
     explicit DownloadItem(QWebEngineDownloadItem *origin, QWidget *parent = nullptr);
+    QWebEngineDownloadItem* download() const;
+    QProgressBar* progress() const;
+    QAction* pause() const;
+    QLabel* state() const;
 
 public slots:
     void displayProgress(qint64 current, qint64 total);
@@ -21,6 +25,8 @@ public slots:
     void openInFiles();
     void pauseRequest();
     void displayState(QWebEngineDownloadItem::DownloadState state);
+    void retryDownload();
+    void deleteLater();
 
 private:
     QWebEngineDownloadItem *m_download;

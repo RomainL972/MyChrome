@@ -10,13 +10,16 @@ DownloadManager::DownloadManager(QWidget *parent) : QWidget(parent)
     setLayout(new QVBoxLayout);
 }
 
+QList<DownloadItem *> DownloadManager::downloads() const
+{
+    return m_downloads;
+}
+
 void DownloadManager::downloadItem(QWebEngineDownloadItem *download)
 {
     show();
     DownloadItem *downloadIt = new DownloadItem(download, this);
     layout()->addWidget(downloadIt);
-    m_downloads.append(downloadIt);
+    downloads().append(downloadIt);
     download->accept();
 }
-
-

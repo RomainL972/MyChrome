@@ -32,18 +32,28 @@ URL loading now uses QUrl::fromUserInput
 put download manager in mainwindow instead of webpage
 use of parent() and mainwindow() in WebPage instead of m_parent
 
-Version 1.3.1
+Version 1.3.1 - Fri, 1 Jun 2018 11:04:09 -0400
 Changing a lot of things to make it more regular, folow the common practices...
 
-Version 1.4
+Version 1.4 - Tue, 19 Jun 2018 12:53:53 -0400
 Add support for when browser asks to open a new tab
 Add a completer to m_urlField
 set tabs closable
 Moved some connect from WebPage to MainWindow
 
+1.4.1
+Improve downloads:
+Add accessors
+Add retry and remove actions
+Show actions only if available
+Fixed pause/resume not switching
+Re-implement deleteLater to remove download from list
+Warning: There seems to be a problem when a download is interrupted
+
 Future:
 Create global history
 Add settings page for home page, search engine...
-Get someone to look for bugs
+Get someone to look for bugs, Matteo?
 Fix completer for url field
 Translate everything
+Deploy on MAc
